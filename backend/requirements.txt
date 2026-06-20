@@ -5,8 +5,8 @@ uvicorn[standard]
 # GitHub repo cloning
 gitpython
 
-# Embeddings (runs locally, no API key)
-sentence-transformers
+# Embeddings (Cohere hosted API)
+cohere
 
 # Vector store
 chromadb
