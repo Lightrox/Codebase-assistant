@@ -19,7 +19,6 @@ venv/
 *.swo
 
 # Build
-dist/
 build/
 *.egg
 
