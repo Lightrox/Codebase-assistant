@@ -27,7 +27,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",  # Vite default port
-        "https://Lightrox.github.io",  # GitHub Pages
+        "https://lightrox.github.io",  # GitHub Pages
     ],
     allow_methods=["*"],
     allow_headers=["*"],
