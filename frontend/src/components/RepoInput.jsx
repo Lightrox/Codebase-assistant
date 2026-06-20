@@ -13,7 +13,7 @@ export default function RepoInput({ onIngested }) {
     setStatus("Cloning repo...");
 
     try {
-      const res = await fetch("http://localhost:8000/ingest", {
+      const res = await fetch("https://codebase-assistant-db62.onrender.com/ingest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ repo_url: url.trim() }),

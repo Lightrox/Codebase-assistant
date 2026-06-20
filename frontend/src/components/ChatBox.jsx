@@ -27,7 +27,7 @@ export default function ChatBox({ repoUrl }) {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/query", {
+      const res = await fetch("https://codebase-assistant-db62.onrender.com/query", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question }),

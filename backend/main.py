@@ -25,7 +25,10 @@ app = FastAPI(
 # Allow React frontend to call this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],   # Vite default port
+    allow_origins=[
+        "http://localhost:5173",  # Vite default port
+        "https://Lightrox.github.io",  # GitHub Pages
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
