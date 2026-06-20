@@ -36,7 +36,7 @@ def chunk_file(file: dict) -> list[dict]:
         return _chunk_by_regex(content, relative_path, ext)
 
 
-# ── Python chunking (AST-based) ──────────────────────────────────────────────
+# Python chunking 
 
 def _chunk_python(content: str, relative_path: str) -> list[dict]:
     chunks = []
@@ -45,15 +45,14 @@ def _chunk_python(content: str, relative_path: str) -> list[dict]:
     try:
         tree = ast.parse(content)
     except SyntaxError:
-        # If parsing fails, fall back to whole file as one chunk
         return _whole_file_chunk(content, relative_path)
 
     for node in ast.walk(tree):
         if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             continue
 
-        start = node.lineno - 1          # ast is 1-indexed
-        end = node.end_lineno            # end_lineno is inclusive
+        start = node.lineno - 1        
+        end = node.end_lineno            
 
         code = "\n".join(lines[start:end])
 
@@ -65,16 +64,14 @@ def _chunk_python(content: str, relative_path: str) -> list[dict]:
             "chunk_id": f"{relative_path}::{node.lineno}"
         })
 
-    # If no functions/classes found, treat whole file as one chunk
     if not chunks:
         return _whole_file_chunk(content, relative_path)
 
     return chunks
 
 
-# ── Regex-based chunking for Java, JS, TS, Go, C++ ───────────────────────────
+# Regex-based chunking for Java, JS, TS, Go, C++
 
-# Matches common function/method signatures across languages
 FUNCTION_PATTERNS = {
     ".java": r'((?:public|private|protected|static|final|abstract|synchronized)\s+[\w<>\[\]]+\s+\w+\s*\([^)]*\)\s*(?:throws\s+\w+)?\s*\{)',
     ".js":   r'((?:async\s+)?function\s+\w+\s*\([^)]*\)\s*\{|(?:const|let|var)\s+\w+\s*=\s*(?:async\s+)?\([^)]*\)\s*=>\s*\{)',
@@ -123,7 +120,7 @@ def _chunk_by_regex(content: str, relative_path: str, ext: str) -> list[dict]:
     return chunks
 
 
-# ── Fallback: whole file as one chunk ────────────────────────────────────────
+# ── Fallback: whole file as one chunk 
 
 def _whole_file_chunk(content: str, relative_path: str) -> list[dict]:
     return [{
@@ -135,7 +132,7 @@ def _whole_file_chunk(content: str, relative_path: str) -> list[dict]:
     }]
 
 
-# ── Entrypoint: chunk all files ──────────────────────────────────────────────
+# ── Entrypoint: chunk all files ─
 
 def chunk_all_files(files: list[dict]) -> list[dict]:
     """

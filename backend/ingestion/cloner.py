@@ -6,19 +6,6 @@ from git.exc import GitCommandError
 
 
 def clone_repo(repo_url: str) -> str:
-    """
-    Clones a GitHub repo to a temporary local directory.
-
-    Args:
-        repo_url: GitHub URL e.g. "https://github.com/user/repo"
-
-    Returns:
-        Local path where the repo is cloned e.g. "/tmp/abc123/repo"
-
-    Raises:
-        ValueError: if URL is not a valid GitHub URL
-        RuntimeError: if cloning fails
-    """
 
     # Basic validation
     import re

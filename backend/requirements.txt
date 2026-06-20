@@ -1,0 +1,24 @@
+# Web framework
+fastapi
+uvicorn[standard]
+
+# GitHub repo cloning
+gitpython
+
+# Embeddings (runs locally, no API key)
+sentence-transformers
+
+# Vector store
+chromadb
+
+# Keyword search
+rank-bm25
+
+# LLM API
+groq
+
+# Data validation
+pydantic
+
+# Utilities
+python-dotenv

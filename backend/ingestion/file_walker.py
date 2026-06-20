@@ -44,7 +44,7 @@ def walk_files(repo_path: str) -> list[dict]:
                 continue
 
             full_path = os.path.join(root, filename)
-            relative_path = os.path.relpath(full_path, repo_path)
+            relative_path = os.path.relpath(full_path, repo_path).replace(os.sep, "/")
 
             try:
                 with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
