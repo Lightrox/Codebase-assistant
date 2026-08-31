@@ -28,14 +28,33 @@ def generate(question: str, chunks: list[dict]) -> dict:
     # Use active Groq model
     model = os.getenv("GROQ_MODEL", "groq/compound-mini")
 
-    # Format the context retrieved from RAG
+    # Max character caps to prevent HTTP 413 (Request Entity Too Large) errors from Groq API
+    MAX_CHUNK_CHARS = 2500
+    MAX_TOTAL_CHARS = 12000
+
+    # Format the context retrieved from RAG with safe character bounds
+    used_chunks = []
     if not chunks:
         context_text = "No relevant code context was found in the repository."
     else:
-        context_text = ""
+        context_parts = []
+        total_chars = 0
         for i, chunk in enumerate(chunks, 1):
-            context_text += f"--- Source {i}: {chunk['file']} (Lines {chunk['start_line']}-{chunk['end_line']}) ---\n"
-            context_text += f"{chunk['code']}\n\n"
+            code = chunk.get("code", "")
+            if len(code) > MAX_CHUNK_CHARS:
+                code = code[:MAX_CHUNK_CHARS] + "\n... [truncated chunk text]"
+
+            chunk_entry = f"--- Source {i}: {chunk['file']} (Lines {chunk['start_line']}-{chunk['end_line']}) ---\n{code}\n\n"
+            if total_chars + len(chunk_entry) > MAX_TOTAL_CHARS:
+                if not context_parts:
+                    context_parts.append(chunk_entry[:MAX_TOTAL_CHARS])
+                    used_chunks.append(chunk)
+                break
+            context_parts.append(chunk_entry)
+            total_chars += len(chunk_entry)
+            used_chunks.append(chunk)
+
+        context_text = "".join(context_parts)
 
     system_prompt = (
         "You are an expert codebase assistant. Your goal is to answer the user's questions about their code "
@@ -46,14 +65,14 @@ def generate(question: str, chunks: list[dict]) -> dict:
 
     user_content = f"Context:\n{context_text}\n\nQuestion: {question}"
 
-    # Prepare citations
+    # Prepare citations for used chunks
     citations = [
         {
             "file": chunk["file"],
             "start_line": chunk["start_line"],
             "end_line": chunk["end_line"]
         }
-        for chunk in chunks
+        for chunk in used_chunks
     ]
 
     try:
