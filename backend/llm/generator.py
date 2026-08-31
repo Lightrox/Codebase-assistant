@@ -25,8 +25,8 @@ def generate(question: str, chunks: list[dict]) -> dict:
             "citations": []
         }
 
-    # Use standard Llama-3-8b model on Groq
-    model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+    # Use active Groq model
+    model = os.getenv("GROQ_MODEL", "groq/compound-mini")
 
     # Format the context retrieved from RAG
     if not chunks:
