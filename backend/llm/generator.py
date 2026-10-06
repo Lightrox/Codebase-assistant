@@ -1,4 +1,5 @@
 import os
+import re
 from groq import Groq
 
 UI_SNIPPET_MAX_LINES = 40
@@ -101,15 +102,15 @@ def generate(question: str, chunks: list[dict]) -> dict:
 
     system_prompt = (
         "You are an expert codebase assistant. Your goal is to answer the user's questions about their code "
-        "using ONLY the provided code context. If the context does not contain enough information to answer the question, "
-        "say so clearly. Support your explanation with exact code references or snippets from the context where appropriate. "
+        "using ONLY the provided code context for codebase questions. For greetings or unrelated conversational questions, "
+        "respond briefly without using the code context. If the context does not contain enough information to answer a "
+        "codebase question, say so clearly. After an answer that relies on repository context, append a marker for each "
+        "supporting source in the exact format [[source:N]], using its source number from the context. Do not include "
+        "markers for sources you did not use, and do not include any markers for conversational or unrelated answers. "
         "Keep your response concise, clear, and structured."
     )
 
     user_content = f"Context:\n{context_text}\n\nQuestion: {question}"
-
-    # Citations come from retrieved chunks, not from the LLM.
-    citations = [_citation_from_chunk(chunk) for chunk in used_chunks]
 
     try:
         client = Groq(api_key=api_key)
@@ -122,13 +123,24 @@ def generate(question: str, chunks: list[dict]) -> dict:
             temperature=0.2,
             max_tokens=1024,
         )
+        answer = response.choices[0].message.content or ""
+        source_numbers = {
+            int(number)
+            for number in re.findall(r"\[\[source:(\d+)\]\]", answer)
+        }
+        answer = re.sub(r"\s*\[\[source:\d+\]\]", "", answer).rstrip()
+        citations = [
+            _citation_from_chunk(chunk)
+            for number, chunk in enumerate(used_chunks, 1)
+            if number in source_numbers
+        ]
         return {
-            "answer": response.choices[0].message.content,
+            "answer": answer,
             "citations": citations
         }
     except Exception as e:
         print(f"[Generator] Error calling Groq API: {e}")
         return {
             "answer": f"Error: Failed to generate an answer from Groq. Details: {str(e)}",
-            "citations": citations
+            "citations": []
         }
