@@ -69,7 +69,7 @@ def generate(question: str, chunks: list[dict]) -> dict:
         }
 
     # Use active Groq model
-    model = os.getenv("GROQ_MODEL", "groq/compound-mini")
+    model = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 
     # Max character caps to prevent HTTP 413 (Request Entity Too Large) errors from Groq API
     MAX_CHUNK_CHARS = 2500

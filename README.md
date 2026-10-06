@@ -48,7 +48,7 @@ self-contained unit of code.
 | Embeddings | sentence-transformers (`all-MiniLM-L6-v2`) | Free, local, no API key |
 | Vector store | ChromaDB | Zero-setup, persistent, local |
 | Keyword search | BM25 (`rank-bm25`) | Catches exact identifier matches |
-| LLM | Groq (`llama3-8b-8192`) | Fast, free tier, open-source model |
+| LLM | Groq (`openai/gpt-oss-20b`) | Open-source chat model available on Groq's free tier |
 | Frontend | React + Vite | Lightweight chat UI |
 
 ## Project structure
