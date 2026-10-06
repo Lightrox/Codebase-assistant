@@ -1,6 +1,49 @@
 import os
 from groq import Groq
 
+UI_SNIPPET_MAX_LINES = 40
+UI_SNIPPET_MAX_CHARS = 2000
+
+
+def _github_blob_url(chunk: dict) -> str:
+    owner = chunk.get("owner") or ""
+    repo = chunk.get("repo") or ""
+    sha = chunk.get("commit_sha") or ""
+    file_path = (chunk.get("file") or "").lstrip("/")
+    start = chunk.get("start_line")
+    end = chunk.get("end_line")
+    if not owner or not repo or not sha or not file_path or start is None or end is None:
+        return ""
+    return f"https://github.com/{owner}/{repo}/blob/{sha}/{file_path}#L{start}-L{end}"
+
+
+def _display_code(code: str) -> str:
+    if not code:
+        return ""
+    lines = code.splitlines()
+    truncated = False
+    if len(lines) > UI_SNIPPET_MAX_LINES:
+        lines = lines[:UI_SNIPPET_MAX_LINES]
+        truncated = True
+    text = "\n".join(lines)
+    if len(text) > UI_SNIPPET_MAX_CHARS:
+        text = text[:UI_SNIPPET_MAX_CHARS]
+        truncated = True
+    if truncated:
+        text += "\n..."
+    return text
+
+
+def _citation_from_chunk(chunk: dict) -> dict:
+    return {
+        "file": chunk["file"],
+        "start_line": chunk["start_line"],
+        "end_line": chunk["end_line"],
+        "url": _github_blob_url(chunk),
+        "code": _display_code(chunk.get("code", "")),
+    }
+
+
 def generate(question: str, chunks: list[dict]) -> dict:
     """
     Generates an answer using the Groq API based on the retrieved code chunks,
@@ -65,15 +108,8 @@ def generate(question: str, chunks: list[dict]) -> dict:
 
     user_content = f"Context:\n{context_text}\n\nQuestion: {question}"
 
-    # Prepare citations for used chunks
-    citations = [
-        {
-            "file": chunk["file"],
-            "start_line": chunk["start_line"],
-            "end_line": chunk["end_line"]
-        }
-        for chunk in used_chunks
-    ]
+    # Citations come from retrieved chunks, not from the LLM.
+    citations = [_citation_from_chunk(chunk) for chunk in used_chunks]
 
     try:
         client = Groq(api_key=api_key)

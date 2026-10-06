@@ -284,24 +284,58 @@ body {
 .citations {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
     margin-top: 6px;
+    max-width: 85%;
 }
 
 .citation {
     display: flex;
-    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
     font-family: var(--mono);
     font-size: 0.72rem;
     color: var(--text-dim);
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 5px 10px;
+    padding: 8px 10px;
+}
+
+.citation-header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .citation-file {
     color: var(--accent);
+}
+
+.citation-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.citation-link:hover .citation-file {
+    text-decoration: underline;
+}
+
+.citation-code {
+    margin: 8px 0 0;
+    max-height: 200px;
+    overflow: auto;
+    padding: 8px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    line-height: 1.45;
+    white-space: pre;
+    color: var(--text);
 }
 
 .chatbox .input-row {

@@ -41,16 +41,25 @@ def retrieve(question: str, top_k: int = 5) -> list[dict]:
     def get_doc_key(doc: dict) -> tuple:
         return (doc["file"], doc["start_line"], doc["end_line"])
 
+    def merge_doc(doc: dict) -> None:
+        key = get_doc_key(doc)
+        existing = doc_map.get(key)
+        if existing:
+            for field in ("owner", "repo", "commit_sha", "code"):
+                if not doc.get(field) and existing.get(field):
+                    doc[field] = existing[field]
+        doc_map[key] = doc
+
     # Rank BM25 results
     for rank, doc in enumerate(bm25_results, 1):
+        merge_doc(doc)
         key = get_doc_key(doc)
-        doc_map[key] = doc
         rrf_scores[key] = rrf_scores.get(key, 0.0) + (1.0 / (k + rank))
 
     # Rank Semantic results
     for rank, doc in enumerate(semantic_results, 1):
+        merge_doc(doc)
         key = get_doc_key(doc)
-        doc_map[key] = doc
         rrf_scores[key] = rrf_scores.get(key, 0.0) + (1.0 / (k + rank))
 
     if not rrf_scores:

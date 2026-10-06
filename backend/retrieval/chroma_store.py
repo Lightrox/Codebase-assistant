@@ -43,6 +43,9 @@ def store(chunks: list[dict]):
             "file":       chunk["file"],
             "start_line": chunk["start_line"],
             "end_line":   chunk["end_line"],
+            "owner":      chunk.get("owner", ""),
+            "repo":       chunk.get("repo", ""),
+            "commit_sha": chunk.get("commit_sha", ""),
         }
         for chunk in chunks
     ]
@@ -103,6 +106,9 @@ def query(query_embedding: list[float], top_k: int = 5) -> list[dict]:
             "file":       meta["file"],
             "start_line": meta["start_line"],
             "end_line":   meta["end_line"],
+            "owner":      meta.get("owner", ""),
+            "repo":       meta.get("repo", ""),
+            "commit_sha": meta.get("commit_sha", ""),
             "score":      round(1 - dist, 4)   # convert distance → similarity
         })
 

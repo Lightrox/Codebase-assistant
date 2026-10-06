@@ -58,7 +58,8 @@ def ingest(request: IngestRequest):
 
     try:
         # Step 1 — Clone
-        repo_path = clone_repo(request.repo_url)
+        cloned = clone_repo(request.repo_url)
+        repo_path = cloned["path"]
 
         # Step 2 — Walk files
         files = walk_files(repo_path)
@@ -67,6 +68,13 @@ def ingest(request: IngestRequest):
 
         # Step 3 — Chunk
         chunks = chunk_all_files(files)
+
+        # Stamp GitHub identity onto every chunk so citations can link
+        # after the clone is deleted from disk.
+        for chunk in chunks:
+            chunk["owner"] = cloned["owner"]
+            chunk["repo"] = cloned["repo"]
+            chunk["commit_sha"] = cloned["commit_sha"]
 
         # Step 4 — Embed
         chunks = embed_chunks(chunks)
@@ -80,7 +88,10 @@ def ingest(request: IngestRequest):
         return IngestResponse(
             message=f"Successfully ingested {len(chunks)} chunks from {len(files)} files.",
             total_chunks=len(chunks),
-            total_files=len(files)
+            total_files=len(files),
+            owner=cloned["owner"],
+            repo=cloned["repo"],
+            commit_sha=cloned["commit_sha"],
         )
 
     except ValueError as e:

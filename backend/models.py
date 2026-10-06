@@ -8,6 +8,9 @@ class IngestResponse(BaseModel):
     message: str
     total_chunks: int
     total_files: int
+    owner: str
+    repo: str
+    commit_sha: str
 
 class QueryRequest(BaseModel):
     question: str = Field(..., description="The question about the codebase.")
@@ -16,6 +19,8 @@ class Citation(BaseModel):
     file: str
     start_line: int
     end_line: int
+    url: str = ""
+    code: str = ""
 
 class QueryResponse(BaseModel):
     answer: str

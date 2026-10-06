@@ -114,6 +114,9 @@ def search(query: str, top_k: int = 5) -> list[dict]:
             "file":       chunk["file"],
             "start_line": chunk["start_line"],
             "end_line":   chunk["end_line"],
+            "owner":      chunk.get("owner", ""),
+            "repo":       chunk.get("repo", ""),
+            "commit_sha": chunk.get("commit_sha", ""),
             "score":      round(float(score), 4)
         })
 
